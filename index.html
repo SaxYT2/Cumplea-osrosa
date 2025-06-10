@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Feliz cumpleaños</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Sacramento&family=Open+Sans&display=swap');
+
+  * {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+  }
+
+  body, html {
+    height: 100vh;
+    background: #ffe6e9;
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* Contenedor principal para alinear fotos y carta */
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    position: relative;
+  }
+
+  /* Fotos externas ocultas por defecto */
+  .photos-left, .photos-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.7s ease;
+  }
+
+  .photos-left.show, .photos-right.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .photos-left img, .photos-right img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(233, 30, 99, 0.25);
+    transition: transform 0.3s ease;
+  }
+
+  /* Rotaciones diagonales fotos izquierda */
+  .photos-left img:nth-child(1) {
+    transform: rotate(-12deg);
+  }
+  .photos-left img:nth-child(2) {
+    transform: rotate(10deg);
+  }
+
+  /* Rotaciones diagonales fotos derecha */
+  .photos-right img:nth-child(1) {
+    transform: rotate(14deg);
+  }
+  .photos-right img:nth-child(2) {
+    transform: rotate(-9deg);
+  }
+
+  /* Carta estilo realista */
+  .card {
+    width: 420px;
+    height: 260px;
+    background: linear-gradient(145deg, #fff8f9, #ffd6e1);
+    border-radius: 25px;
+    box-shadow:
+      inset 0 0 10px 2px #f8bbd0,
+      0 20px 40px rgba(233, 30, 99, 0.25);
+    position: relative;
+    cursor: pointer;
+    perspective: 1200px;
+    user-select: none;
+  }
+
+  /* Carta cerrada - tapa frontal */
+  .card-front {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(160deg, #fce4ec 0%, #f8bbd0 100%);
+    border-radius: 25px;
+    box-shadow: inset 0 2px 5px rgba(255 255 255 / 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Sacramento', cursive;
+    font-size: 2.8rem;
+    color: #ad1457;
+    text-shadow: 0 0 6px #f48fb1;
+    transform-origin: bottom center;
+    transition: transform 1.2s ease;
+    z-index: 10;
+    backface-visibility: hidden;
+  }
+
+  /* Carta abierta - contenido */
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 25px;
+    padding: 25px 35px;
+    box-shadow: inset 0 0 12px #f8bbd0;
+    color: #880e4f;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+    user-select: text;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .card.open .card-front {
+    transform: rotateX(-90deg);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card.open .card-inner {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .card-inner h2 {
+    font-family: 'Pacifico', cursive;
+    text-align: center;
+    color: #e91e63;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+  }
+
+  /* Contenedor botones */
+  .buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 520px;
+  }
+
+  button {
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(233, 30, 99, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    flex: 1;
+  }
+
+  button:hover {
+    background-color: #c2185b;
+    box-shadow: 0 12px 25px rgba(194, 24, 91, 0.5);
+  }
+
+  /* Mensaje debajo de los botones */
+  #message {
+    margin-top: 25px;
+    font-size: 1.1rem;
+    color: #ad1457;
+    background: #fce4ec;
+    border-radius: 20px;
+    padding: 15px 25px;
+    text-align: center;
+    box-shadow: inset 0 0 15px #f8bbd0;
+    width: 520px;
+    min-height: 90px;
+    font-style: italic;
+  }
+
+  /* Decoración cumpleaños */
+  .birthday-decor {
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 140px;
+    height: 140px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+  }
+
+  .balloon {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.85;
+    animation: floatUp 5s infinite ease-in-out;
+  }
+
+  .balloon:nth-child(1) {
+    width: 40px; height: 55px;
+    background: #ff80ab;
+    left: 10px;
+    animation-delay: 0s;
+  }
+  .balloon:nth-child(2) {
+    width: 50px; height: 65px;
+    background: #ff4081;
+    left: 50px;
+    animation-delay: 1.7s;
+  }
+  .balloon:nth-child(3) {
+    width: 45px; height: 60px;
+    background: #f50057;
+    left: 85px;
+    animation-delay: 3.2s;
+  }
+
+  @keyframes floatUp {
+    0%, 100% { transform: translateY(0);}
+    50% { transform: translateY(-25px);}
+  }
+
+  /* Responsive */
+  @media (max-width: 620px) {
+    .container {
+      flex-direction: column;
+      gap: 20px;
+    }
+    .photos-left, .photos-right {
+      flex-direction: row;
+      gap: 15px;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    .photos-left img, .photos-right img {
+      width: 70px;
+      height: 70px;
+    }
+    .buttons, #message {
+      width: 90vw;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="photos-left" id="photosLeft">
+    <!-- Fotos izquierda -->
+  </div>
+
+  <div class="card" id="card">
+    <div class="card-front" id="cardFront">Click para abrir la carta</div>
+    <div class="card-inner" id="cardInner">
+      <!-- Texto de la carta -->
+    </div>
+
+    <!-- Decoración cumpleaños -->
+    <div class="birthday-decor" id="birthdayDecor" style="display:none;">
+      <div class="balloon"></div>
+      <div class="balloon"></div>
+      <div class="balloon"></div>
+    </div>
+  </div>
+
+  <div class="photos-right" id="photosRight">
+    <!-- Fotos derecha -->
+  </div>
+</div>
+
+<div class="buttons">
+  <button id="playMusicBtn" disabled>Reproducir Música</button>
+  <button id="nextSceneBtn">Pasar de escenario</button>
+</div>
+
+<div id="message">Haz click en la carta para abrir el mensaje.</div>
+
+<audio id="audioPlayer" src=""></audio>
+
+<script>
+  const scenes = [
+    {
+      title: "Holii hoy cumples años :D,",
+      text: "Estas sopresitas son para ti, a la niña que siempre ha sido especial conmigo y ayudarme en mis malos momentos <3, y por eso en cada carta o escenario hay diferentes canciones con las cuales nos hemos dedicado :3.",
+      bgColor: "#fce4ec",
+      message: "Un abrazo fuerte, siempre contigo.",
+      music: "best.mp3",
+    },
+    {
+      title: "Pensando en ti,",
+      text: "Aunque la distancia nos separe, siempre te llevo en mi corazón.",
+      bgColor: "#fff0f6",
+      message: "Eres una luz que nunca se apaga.",
+      music: "count.mp3",
+    },
+    {
+      title: "Tu sonrisa,",
+      text: "Es la melodía que alegra mis días más grises.",
+      bgColor: "#ffe6f0",
+      message: "Nunca dejes de brillar.",
+      music: "mai.mp3",
+    },
+    {
+      title: "Siempre juntos,",
+      text: "No importa las dificultades, siempre estaremos juntos :D.",
+      bgColor: "#fff0f3",
+      message: "Gracias por ser mi confidente.",
+      music: "manta.mp3",
+    },
+    {
+      title: "Amor y amistad,",
+      text: "Son regalos que nunca dejan de crecer si los cuidamos con el alma.",
+      bgColor: "#ffeef3",
+      message: "Aquí siempre encontrarás un corazón sincero.",
+      music: "birds.mp3",
+    },
+    {
+      title: "¡Feliz cumpleaños!",
+      text: "Feliz cumpleaños, amiga querida. Que este nuevo año esté lleno de amor y alegría.",
+      bgColor: "#fce4ec",
+      message: "¡Celebremos con globos, risas y mucho cariño!",
+      music: "vivo.mp3",
+      special: true,
+    }
+  ];
+
+  let currentScene = 0;
+  const card = document.getElementById('card');
+  const cardFront = document.getElementById('cardFront');
+  const cardInner = document.getElementById('cardInner');
+  const playMusicBtn = document.getElementById('playMusicBtn');
+  const nextSceneBtn = document.getElementById('nextSceneBtn');
+  const message = document.getElementById('message');
+  const audioPlayer = document.getElementById('audioPlayer');
+  const birthdayDecor = document.getElementById('birthdayDecor');
+  const photosLeft = document.getElementById('photosLeft');
+  const photosRight = document.getElementById('photosRight');
+
+  function loadScene(index) {
+    const scene = scenes[index];
+    document.body.style.backgroundColor = scene.bgColor;
+    message.textContent = scene.message;
+
+    if (scene.music) {
+      playMusicBtn.disabled = false;
+      audioPlayer.src = scene.music;
+      audioPlayer.pause();
+      playMusicBtn.textContent = "Reproducir Música";
+    } else {
+      playMusicBtn.disabled = true;
+      audioPlayer.pause();
+      audioPlayer.src = "";
+      playMusicBtn.textContent = "Reproducir Música";
+    }
+
+    birthdayDecor.style.display = scene.special ? 'block' : 'none';
+
+    card.classList.remove('open');
+    cardFront.textContent = "Click para abrir la carta";
+
+    cardInner.innerHTML = `
+      <h2>${scene.title}</h2>
+      <p>${scene.text}</p>
+    `;
+
+    // Fotos ocultas al cargar escena
+    photosLeft.classList.remove('show');
+    photosRight.classList.remove('show');
+  }
+
+  cardFront.addEventListener('click', () => {
+    card.classList.toggle('open');
+    if(card.classList.contains('open')) {
+      cardFront.textContent = "Cerrar carta";
+
+      // Mostrar fotos al abrir carta
+      const scene = scenes[currentScene];
+      photosLeft.innerHTML = `
+        <img src="${scene.photos[0]}" alt="Foto 1" />
+        <img src="${scene.photos[1]}" alt="Foto 2" />
+      `;
+      photosRight.innerHTML = `
+        <img src="${scene.photos[2]}" alt="Foto 3" />
+        <img src="${scene.photos[3]}" alt="Foto 4" />
+      `;
+      photosLeft.classList.add('show');
+      photosRight.classList.add('show');
+    } else {
+      cardFront.textContent = "Click para abrir la carta";
+
+      // Ocultar fotos al cerrar carta
+      photosLeft.classList.remove('show');
+      photosRight.classList.remove('show');
+      photosLeft.innerHTML = '';
+      photosRight.innerHTML = '';
+    }
+  });
+
+  playMusicBtn.addEventListener('click', () => {
+    if(audioPlayer.paused) {
+      audioPlayer.play();
+      playMusicBtn.textContent = "Pausar Música";
+    } else {
+      audioPlayer.pause();
+      playMusicBtn.textContent = "Reproducir Música";
+    }
+  });
+
+  nextSceneBtn.addEventListener('click', () => {
+    currentScene = (currentScene + 1) % scenes.length;
+    loadScene(currentScene);
+  });
+
+  loadScene(currentScene);
+</script>
+
+</body>
+</html>
+
+
